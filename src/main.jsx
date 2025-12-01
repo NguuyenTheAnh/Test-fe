@@ -8,6 +8,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import HomePage from './pages/home.jsx';
+import AddHousePage from './pages/add-house.jsx';
 
 const router = createBrowserRouter([
   {
@@ -18,10 +19,10 @@ const router = createBrowserRouter([
         index: true,
         element: <HomePage />
       },
-      // {
-      //   path: "user",
-      //   element: <UserPage />
-      // },
+      {
+        path: "add",
+        element: <AddHousePage />
+      },
     ]
   },
 ]);
