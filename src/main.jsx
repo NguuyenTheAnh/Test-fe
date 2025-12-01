@@ -1,34 +1,35 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './styles/global.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import keycloak from "./keycloak.js";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import HomePage from './pages/home.jsx';
+const rootElement = document.getElementById("root");
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        index: true,
-        element: <HomePage />
-      },
-      // {
-      //   path: "user",
-      //   element: <UserPage />
-      // },
-    ]
-  },
-]);
+const renderApp = () => {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+};
 
+keycloak
+  .init({ onLoad: "login-required" })
+  .then((authenticated) => {
+    if (!authenticated) {
+      return keycloak.login();
+    }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
-)
+    setInterval(() => {
+      keycloak
+        .updateToken(70)
+        .catch(() => keycloak.login());
+    }, 30000);
+
+    renderApp();
+    return null;
+  })
+  .catch((error) => {
+    console.error("Failed to initialize Keycloak", error);
+    keycloak.login();
+  });
